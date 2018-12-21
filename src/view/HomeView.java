@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
+import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import controller.ViewManager;
@@ -12,7 +13,8 @@ import controller.ViewManager;
 @SuppressWarnings("serial")
 public class HomeView extends JPanel implements ActionListener {
 	
-	private ViewManager manager;		// manages interactions between the views, model, and database
+	private ViewManager manager;	// manages interactions between the views, model, and database
+	private JButton logOutButton = new JButton("Log Out");
 	
 	/**
 	 * Constructs an instance (or objects) of the HomeView class.
@@ -41,6 +43,9 @@ public class HomeView extends JPanel implements ActionListener {
 		// building the HomeView.
 		
 		this.add(new javax.swing.JLabel("HomeView", javax.swing.SwingConstants.CENTER));
+		
+		logOutButton.addActionListener(this);
+		this.add(logOutButton, javax.swing.SwingConstants.CENTER);
 		
 		// TODO
 		//
@@ -72,6 +77,10 @@ public class HomeView extends JPanel implements ActionListener {
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == logOutButton) {
+			
+			manager.logOut();
+		}
 		
 		// TODO
 		//

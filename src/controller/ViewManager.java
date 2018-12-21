@@ -86,4 +86,10 @@ public class ViewManager {
 			e.printStackTrace();
 		}
 	}
+	
+	public void logOut() {
+		this.switchTo(ATM.LOGIN_VIEW);
+		this.account = null;
+		this.destination = null;
+	}
 }
