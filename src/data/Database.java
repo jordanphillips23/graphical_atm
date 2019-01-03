@@ -77,6 +77,7 @@ public class Database {
 		return null;
 	}
 	
+	
 	/**
 	 * Retrieves an existing account by account number.
 	 * 
@@ -308,5 +309,22 @@ public class Database {
 			insertStmt.executeUpdate();
 			insertStmt.close();
 		}
+	}
+	
+	public long getNewAccountNumber() {
+		try {
+			stmt = conn.createStatement();
+			
+			
+			rs = stmt.executeQuery("SELECT * FROM accounts");
+			if (rs.next()) {
+
+				return rs.getLong(Database.ACCOUNT_NUMBER) + 1;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return -1;
 	}
 }

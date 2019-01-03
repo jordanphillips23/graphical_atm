@@ -37,6 +37,8 @@ public class ATM extends JFrame {
 	public final static int LOGIN_VIEW_INDEX = 0;
 	public final static int CREATE_VIEW_INDEX = 1;
 	public final static int HOME_VIEW_INDEX = 2;
+	
+	private JPanel views;
 		
 	/**
 	 * Constructs an instance (or object) of the ATM class.
@@ -53,7 +55,7 @@ public class ATM extends JFrame {
 	 */
 	
 	private void initialize() {		
-		JPanel views = new JPanel(new CardLayout());
+		views = new JPanel(new CardLayout());
 		ViewManager manager = new ViewManager(views);
 		
 		// add child views to the parent container
@@ -84,7 +86,11 @@ public class ATM extends JFrame {
 	}
 	
 	///////////////////// MAIN METHOD /////////////////////////////////////////////////
-
+	
+	public JPanel getViews() {
+		return views;
+	}
+	
 	/**
 	 * Program execution starts here.
 	 * 

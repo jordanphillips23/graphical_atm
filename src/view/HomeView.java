@@ -9,12 +9,15 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import controller.ViewManager;
+import model.BankAccount;
 
 @SuppressWarnings("serial")
 public class HomeView extends JPanel implements ActionListener {
 	
 	private ViewManager manager;	// manages interactions between the views, model, and database
 	private JButton logOutButton = new JButton("Log Out");
+	private BankAccount current = null;
+	
 	
 	/**
 	 * Constructs an instance (or objects) of the HomeView class.
@@ -37,23 +40,27 @@ public class HomeView extends JPanel implements ActionListener {
 	
 	private void initialize() {
 		
+	}
+	
+	private void makeView() {
+		this.removeAll();
 		// TODO
-		//
-		// this is a placeholder for this view and should be removed once you start
-		// building the HomeView.
-		
-		this.add(new javax.swing.JLabel("HomeView", javax.swing.SwingConstants.CENTER));
-		
+					//
+					// this is a placeholder for this view and should be removed once you start
+					// building the HomeView.
+					
+		this.add(new javax.swing.JLabel("Welcome " + current.getUser().getFirstName() + " " + current.getUser().getLastName() + ".", javax.swing.SwingConstants.CENTER));
+					
 		logOutButton.addActionListener(this);
 		this.add(logOutButton, javax.swing.SwingConstants.CENTER);
-		
-		// TODO
-		//
-		// this is where you should build the HomeView (i.e., all the components that
-		// allow the user to interact with the ATM - deposit, withdraw, transfer, etc.).
-		//
-		// feel free to use my layout in LoginView as an example for laying out and
-		// positioning your components.
+					
+					// TODO
+					//
+					// this is where you should build the HomeView (i.e., all the components that
+					// allow the user to interact with the ATM - deposit, withdraw, transfer, etc.).
+					//
+					// feel free to use my layout in LoginView as an example for laying out and
+					// positioning your components.
 	}
 	
 	/*
@@ -90,4 +97,13 @@ public class HomeView extends JPanel implements ActionListener {
 		//
 		// feel free to use my action listener in LoginView.java as an example.
 	}
+	
+	public void setCurrentAccount(BankAccount current) {
+		System.out.println(current.toString());
+		this.current = current;
+		makeView();
+	}
+	
+	
 }
+
