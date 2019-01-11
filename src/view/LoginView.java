@@ -50,7 +50,10 @@ public class LoginView extends JPanel implements ActionListener {
 	
 	///////////////////// INSTANCE METHODS ////////////////////////////////////////////
 	
-	/**
+	public void logOut() {
+		accountField.setText("");
+		pinField.setText("");
+	}	/**
 	 * Updates the error message label.
 	 * 
 	 * @param errorMessage
@@ -151,6 +154,7 @@ public class LoginView extends JPanel implements ActionListener {
 		this.add(createButton);		
 	}
 	
+	
 	/*
 	 * Initializes the components needed for the power button.
 	 */
@@ -169,6 +173,7 @@ public class LoginView extends JPanel implements ActionListener {
 		
 		this.add(powerButton);
 	}
+	
 	
 	/*
 	 * LoginView is not designed to be serialized, and attempts to serialize will throw an IOException.

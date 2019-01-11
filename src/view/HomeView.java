@@ -4,9 +4,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.text.DecimalFormat;
 
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 import controller.ViewManager;
 import model.BankAccount;
@@ -39,20 +42,29 @@ public class HomeView extends JPanel implements ActionListener {
 	 */
 	
 	private void initialize() {
+		this.setLayout(null);
 		
 	}
 	
-	private void makeView() {
+	public void makeView() {
 		this.removeAll();
 		// TODO
 					//
 					// this is a placeholder for this view and should be removed once you start
 					// building the HomeView.
-					
-		this.add(new javax.swing.JLabel("Welcome " + current.getUser().getFirstName() + " " + current.getUser().getLastName() + ".", javax.swing.SwingConstants.CENTER));
+		createLabel("Welcome " + current.getUser().getFirstName() + " " + current.getUser().getLastName() + ".", 100, 0, 300, 35);
+		createLabel("Your Account Number is: " + current.getAccountNumber() + ".", 100, 40, 300, 35);
+		
+		DecimalFormat balance = new DecimalFormat("###,##0.00");
+		createLabel("Your Balance is: $" + balance.format(current.getBalance()), 100, 80, 300, 35);
+		
+		createLinkButton("Deposit", 100, 120, 300, 35, ATM.DEPOSIT_VIEW);
+		createLinkButton("Withdraw", 100, 200, 300, 35, ATM.WITHDRAW_VIEW);
+		createLinkButton("Transfer", 100, 280, 300, 35, ATM.TRANSFER_VIEW);
 					
 		logOutButton.addActionListener(this);
-		this.add(logOutButton, javax.swing.SwingConstants.CENTER);
+		logOutButton.setBounds(10, 430, 200, 40);
+		this.add(logOutButton);
 					
 					// TODO
 					//
@@ -61,6 +73,31 @@ public class HomeView extends JPanel implements ActionListener {
 					//
 					// feel free to use my layout in LoginView as an example for laying out and
 					// positioning your components.
+	}
+	
+	
+	private void createLabel(String message, int x, int y, int width, int height) {
+		JLabel label = new JLabel(message);
+		label.setBounds(x, y, width, height);
+		label.setHorizontalAlignment(SwingConstants.CENTER);
+		this.add(label);
+	}
+	
+	private void createLinkButton(String message, int x, int y, int width, int height, String view) {
+		JButton button = new JButton(message);
+		button.setBounds(x, y, width, height);
+		button.setHorizontalAlignment(SwingConstants.CENTER);
+		button.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				manager.switchTo(view);
+				
+			}
+			
+		});
+		this.add(button);
 	}
 	
 	/*
@@ -90,7 +127,7 @@ public class HomeView extends JPanel implements ActionListener {
 		}
 		
 		// TODO
-		//
+		//	
 		// this is where you'll setup your action listener, which is responsible for
 		// responding to actions the user might take in this view (an action can be a
 		// user clicking a button, typing in a textfield, etc.).

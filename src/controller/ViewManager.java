@@ -9,8 +9,11 @@ import javax.swing.JOptionPane;
 import data.Database;
 import model.BankAccount;
 import view.ATM;
+import view.DepositView;
 import view.HomeView;
 import view.LoginView;
+import view.TransferView;
+import view.WithdrawView;
 
 public class ViewManager {
 	
@@ -51,10 +54,35 @@ public class ViewManager {
 			HomeView hv = ((HomeView) views.getComponents()[ATM.HOME_VIEW_INDEX]);
 			hv.setCurrentAccount(account);
 			
+			passAccountDeposit(account);
+			passAccountWithdraw(account);
+			passAccountTransfer(account);
+			
 			LoginView lv = ((LoginView) views.getComponents()[ATM.LOGIN_VIEW_INDEX]);
 			lv.updateErrorMessage("");
 		}
 	}
+	
+	
+	public void passAccountDeposit(BankAccount current) {
+		DepositView dv = ((DepositView) views.getComponents()[ATM.DEPOSIT_VIEW_INDEX]);
+		dv.setCurrentAccount(current);
+	}
+	
+	public void passAccountWithdraw(BankAccount current) {
+		WithdrawView wv = ((WithdrawView) views.getComponents()[ATM.WITHDRAW_VIEW_INDEX]);
+		wv.setCurrentAccount(current);
+	}
+	public void passAccountTransfer(BankAccount current) {
+		TransferView tv = ((TransferView) views.getComponents()[ATM.TRANSFER_VIEW_INDEX]);
+		tv.setCurrentAccount(current);
+	}
+	
+	public void updateHome() {
+		HomeView hv = ((HomeView) views.getComponents()[ATM.HOME_VIEW_INDEX]);
+		hv.makeView();
+	}
+	
 	
 	/**
 	 * Switches the active (or visible) view upon request.
@@ -92,7 +120,14 @@ public class ViewManager {
 	
 	public void logOut() {
 		this.switchTo(ATM.LOGIN_VIEW);
+		LoginView lv = ((LoginView) views.getComponents()[ATM.LOGIN_VIEW_INDEX]);
+		lv.logOut();
 		this.account = null;
 		this.destination = null;
+		
+	}
+	
+	public Database getDB() {
+		return db;
 	}
 }

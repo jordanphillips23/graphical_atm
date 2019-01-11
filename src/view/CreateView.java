@@ -155,7 +155,7 @@ public class CreateView extends JPanel implements ActionListener {
 			String stateName = state.getSelectedItem().toString();
 			String zip = textFields.get("Postal Code").getText();
 			
-			Database data = new Database();
+			Database data = manager.getDB();
 			
 			User user = new User(pin, dob, phone, first, last, address, city, stateName, zip);
 			
