@@ -7,6 +7,8 @@ import java.io.ObjectOutputStream;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 
 import controller.ViewManager;
 
@@ -32,6 +34,7 @@ public class ATM extends JFrame {
 	public final static String DEPOSIT_VIEW = "DEPOSIT_VIEW";
 	public final static String TRANSFER_VIEW = "TRANSFER_VIEW";
 	public final static String WITHDRAW_VIEW = "WITHDRAW_VIEW";
+	public final static String INFORMATION_VIEW = "INFORMATION_VIEW";
 	
 	/*
 	 * Indexes for views as they are stored in CardLayout.
@@ -43,6 +46,7 @@ public class ATM extends JFrame {
 	public final static int DEPOSIT_VIEW_INDEX = 3;
 	public final static int TRANSFER_VIEW_INDEX = 4;
 	public final static int WITHDRAW_VIEW_INDEX = 5;
+	public final static int INFORMATION_VIEW_INDEX = 6;
 	
 	private JPanel views;
 		
@@ -72,6 +76,7 @@ public class ATM extends JFrame {
 		views.add(new DepositView(manager), DEPOSIT_VIEW);
 		views.add(new TransferView(manager), TRANSFER_VIEW);
 		views.add(new WithdrawView(manager), WITHDRAW_VIEW);
+		views.add(new InformationView(manager), INFORMATION_VIEW);
 		
 		
 		// configure the application frame
@@ -112,17 +117,21 @@ public class ATM extends JFrame {
 			public void run() {
 				try {
 					
+//					for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+//						System.out.println(info.getName());
+//						if (info.getName().equals("Mac OS X")) {
+//		
+//							UIManager.setLookAndFeel(info.getClassName());
+//						}
+//					}
+						
 					/*
 					 * Uncomment this to check out a different look and feel (i.e., style)
 					 * for your application. Feel to free to experiment with this and others.
 					 * You'll need to add the required import statements for it to compile.
 					 */
 					
-//					for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-//						if (info.getName().equals("Nimbus")) {
-//							UIManager.setLookAndFeel(laf.getClassName());
-//						}
-//					}
+//					
 					
 					new ATM().initialize();
 				} catch (Exception e) {

@@ -24,16 +24,22 @@ import model.BankAccount;
 import model.User;
 
 @SuppressWarnings("serial")
-public class CreateView extends JPanel implements ActionListener {
+public class InformationView extends InnerView {
 	
 	private HashMap<String, JLabel> labels = new HashMap<String, JLabel>();
 	private HashMap<String, JTextField> textFields = new HashMap<String, JTextField>();
 	private ArrayList<JComboBox<String>> DOB = new ArrayList<JComboBox<String>>();
 	private JComboBox<String> state = new JComboBox<String>();
 	private JPasswordField PIN = new JPasswordField();
+	private JPasswordField oldPIN = new JPasswordField();
 	private JLabel error = new JLabel("");
+	private JButton edit;
+	private JButton cancel;
 	
-	private ViewManager manager;		// manages interactions between the views, model, and database
+	private String[] edittable = {"Phone Number1", "Phone Number2", "Phone Number3", "Street Address", "City", "Postal Code"};
+	
+	private ViewManager manager;	
+	private BankAccount account;// manages interactions between the views, model, and database
 	
 	/**
 	 * Constructs an instance (or object) of the CreateView class.
@@ -41,8 +47,8 @@ public class CreateView extends JPanel implements ActionListener {
 	 * @param manager
 	 */
 	
-	public CreateView(ViewManager manager) {
-		super();
+	public InformationView(ViewManager manager) {
+		super(manager);
 		
 		this.manager = manager;
 		initialize();
@@ -55,7 +61,9 @@ public class CreateView extends JPanel implements ActionListener {
 	 */
 	
 	private void initialize() {
+		this.removeAll();
 		this.setLayout(null);
+		
 		// TODO
 		//
 		// this is a placeholder for this view and should be removed once you start
@@ -70,8 +78,10 @@ public class CreateView extends JPanel implements ActionListener {
 		createState("State", 50, 270, 100, 35, 240);
 		createTextAndLabel("Postal Code", 50, 315, 100, 35, 240, 5, true);
 		createPIN("PIN", 50, 360, 100, 35, 240);
-		createSubmitAndCancel(50, 405, 170, 35);
 		createError(50, 440, 300, 35);
+		createEdit(50, 395, 150, 35);
+		createCancel(250, 395, 150, 35);
+		createBackButton();
 		
 		
 		// TODO
@@ -81,6 +91,56 @@ public class CreateView extends JPanel implements ActionListener {
 		//
 		// feel free to use my layout in LoginView as an example for laying out and
 		// positioning your components.
+		setEditable(false);
+	}
+
+	private void createEdit(int x, int y, int width, int height) {
+		edit = new JButton("edit");
+		edit.setBounds(x, y, width, height);
+		edit.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (textFields.get("Street Address").isEnabled()) {
+					if(updateAccount()) {
+						edit.setText("Edit");
+						setEditable(false);
+						PIN.setText("");
+						oldPIN.setText("");
+						
+					}
+				}
+				else {
+					edit.setText("Save");
+					setEditable(true);
+				}
+				
+				
+			}
+
+			
+		});
+		this.add(edit);
+		
+	}
+	
+	private void createCancel(int x, int y, int width, int height) {
+		cancel = new JButton("Cancel");
+		cancel.setBounds(x, y, width, height);
+		cancel.setVisible(false);
+		cancel.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				edit.setText("Edit");
+				setEditable(false);
+				updateFields();
+				
+			}
+			
+		});
+		this.add(cancel);
+		
 	}
 
 	private void createError(int x, int y, int width, int height) {
@@ -90,39 +150,6 @@ public class CreateView extends JPanel implements ActionListener {
 		
 	}
 
-	private void createSubmitAndCancel(int x, int y, int width, int height) {
-		JButton submit = new JButton("Submit");
-		submit.setBounds(x + width + 10, y, width, height);
-		submit.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (updateDatabase()) {
-					empty();
-					manager.switchTo(ATM.HOME_VIEW);
-				}
-			}
-		});
-		
-		this.add(submit);
-		
-		
-		JButton cancel = new JButton("Cancel");
-		cancel.setBounds(x, y, width, height);
-		cancel.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				empty();
-				manager.switchTo(ATM.LOGIN_VIEW);
-				
-			}
-
-		});
-		
-		this.add(cancel);
-		
-	}
 	
 	private void empty() {
 		
@@ -142,33 +169,62 @@ public class CreateView extends JPanel implements ActionListener {
 		
 		
 	}
+	private void updateFields() {
+		User user = account.getUser();
+		PIN.setText("");
+		oldPIN.setText("");
+		textFields.get("Date of Birth").setText(user.getFormattedDob());
+		textFields.get("First Name").setText(user.getFirstName());
+		textFields.get("Last Name").setText(user.getLastName());
+		textFields.get("Street Address").setText(user.getStreetAddress());
+		textFields.get("Postal Code").setText(user.getZip());
+		textFields.get("City").setText(user.getCity());
+		textFields.get("Phone Number1").setText(String.valueOf(user.getPhone()).substring(0, 3));
+		textFields.get("Phone Number2").setText(String.valueOf(user.getPhone()).substring(3, 6));
+		textFields.get("Phone Number3").setText(String.valueOf(user.getPhone()).substring(6, 10));
+		state.setSelectedItem(user.getState());
+		
+		
+	}
 	
-	private boolean updateDatabase() {
+	private boolean updateAccount() {
 		if (verifyInput()) {
-			int pin = Integer.parseInt(new String(PIN.getPassword()));
-			int dob = Integer.parseInt(DOB.get(2).getSelectedItem().toString() + DOB.get(1).getSelectedItem().toString() + DOB.get(0).getSelectedItem().toString());
+			User user = account.getUser();
+			
+			if (new String(oldPIN.getPassword()).length() != 0) {
+				
+				if (Integer.parseInt(new String(oldPIN.getPassword())) == user.getPin()) {
+					int pin = Integer.parseInt(new String(PIN.getPassword()));
+					user.setPin(user.getPin(), pin);
+				}
+				else {
+					error.setText("Invalid PIN. Must be Old then New");
+					return false;
+				}
+			}
+			
+			
 			long phone = Long.parseLong(textFields.get("Phone Number1").getText() + textFields.get("Phone Number2").getText() + textFields.get("Phone Number3").getText());
-			String first = textFields.get("First Name").getText();
-			String last = textFields.get("Last Name").getText();
 			String address = textFields.get("Street Address").getText();
 			String city = textFields.get("City").getText();
 			String stateName = state.getSelectedItem().toString();
 			String zip = textFields.get("Postal Code").getText();
 			
-			Database data = manager.getDB();
+		
 			
-			User user = new User(pin, dob, phone, first, last, address, city, stateName, zip);
+			user.setPhone(phone);
+			user.setStreetAddress(address);
+			user.setState(stateName);
+			user.setZip(zip);
 			
-			long number = 100000001;
-			while (data.getAccount(number) != null) {
-				number++;
-			}
-			BankAccount bankAccount = new BankAccount('Y', number, 0.0, user);
+			account.setUser(user);
 			
-			data.insertAccount(bankAccount);
-			manager.login(String.valueOf(number), PIN.getPassword());
+			
 			return true;
 		}
+		
+			
+		
 		return false;
 		
 		
@@ -178,19 +234,21 @@ public class CreateView extends JPanel implements ActionListener {
 
 	private boolean verifyInput() {
 		error.setText("");
-		if (new String(PIN.getPassword()).length() != 4) {
-			error.setText("PIN must be 4 numbers long.");
-			return false;
+		if ((new String(PIN.getPassword()).length() != 0 && new String(oldPIN.getPassword()).length() != 0)) {
+			if ((new String(PIN.getPassword()).length() != 4 || new String(oldPIN.getPassword()).length() != 4)){
+				error.setText("PIN must be 4 numbers long.");
+				return false;
+			}
 		}
-		else if ((textFields.get("Phone Number1").getText() + textFields.get("Phone Number2").getText() + textFields.get("Phone Number3").getText()).length() != 10) {
+		if ((textFields.get("Phone Number1").getText() + textFields.get("Phone Number2").getText() + textFields.get("Phone Number3").getText()).length() != 10) {
 			error.setText("Phone Number must be 10 numbers long.");
 			return false;
 		}
-		else if ((textFields.get("Postal Code").getText().length() != 5)) {
+		if ((textFields.get("Postal Code").getText().length() != 5)) {
 			error.setText("Postal Code must be 5 numbers long");
 			return false;
 		}
-		else if (textFields.get("First Name").getText().length() == 0 || textFields.get("Last Name").getText().length() == 0 || textFields.get("Street Address").getText().length() == 0 || textFields.get("City").getText().length() == 0) {
+		if (textFields.get("First Name").getText().length() == 0 || textFields.get("Last Name").getText().length() == 0 || textFields.get("Street Address").getText().length() == 0 || textFields.get("City").getText().length() == 0) {
 			error.setText("All fields are required");
 			return false;
 		}
@@ -220,6 +278,7 @@ public class CreateView extends JPanel implements ActionListener {
 		
 		JTextField textField = new JTextField(30);
 		textField.setBounds(x + widthT + 10, y, widthL, height);
+		textField.setEnabled(false);
 		this.add(textField);
 		if (limit > 0) {
 			textField = textFieldLimit(limit, textField, number);
@@ -234,23 +293,13 @@ public class CreateView extends JPanel implements ActionListener {
 		this.add(label);
 		labels.put("Date of Birth", label);
 		
-		String[] months = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"};
-		JComboBox<String> monthBox = new JComboBox<String>(months); 
-		monthBox.setBounds(x + widthT + 10, y, 3 * widthL / 10, height);
-		this.add(monthBox);
-		DOB.add(monthBox);
+		JTextField textField = new JTextField(30);
+		textField.setBounds(x + widthT + 10, y, widthL, height);
+		textField.setEnabled(false);
+		this.add(textField);
+		textFields.put("Date of Birth" , textField);
 		
-		String[] days = {"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31"};
-		JComboBox<String> dayBox = new JComboBox<String>(days); 
-		dayBox.setBounds(x + widthT + 10 + 3 * widthL / 10, y, 3 * widthL / 10, height);
-		this.add(dayBox);
-		DOB.add(dayBox);
 		
-		String[] years = IntStream.rangeClosed(1900, 2018).mapToObj(String::valueOf).toArray(String[]::new);
-		JComboBox<String> yearBox = new JComboBox<String>(years); 
-		yearBox.setBounds(x + widthT + 10 + 6 * widthL / 10, y, 4 * widthL / 10, height);
-		this.add(yearBox);
-		DOB.add(yearBox);
 		
 	}
 	
@@ -288,8 +337,24 @@ public class CreateView extends JPanel implements ActionListener {
 		this.add(label);
 		labels.put(name , label);
 		
+		oldPIN = new JPasswordField(30);
+		oldPIN.setBounds(x + widthT + 10, y, (widthL - 20 )/ 2, height);
+		oldPIN.setToolTipText("old PIN");
+		oldPIN.addKeyListener(new KeyAdapter() {
+		    public void keyTyped(KeyEvent e) { 
+		    	if  (!Character.isDigit(e.getKeyChar())) {
+		    		e.consume();
+		    	}
+		        if (oldPIN.getPassword().length >= 4 ) // limit textfield to 3 characters
+		        	e.consume(); 
+		    }  
+		    
+		});
+		this.add(oldPIN);
+		
 		PIN = new JPasswordField(30);
-		PIN.setBounds(x + widthT + 10, y, widthL, height);
+		PIN.setBounds(x + widthT + 10 + widthL / 2, y, (widthL - 20 )/ 2, height);
+		PIN.setToolTipText("new PIN");
 		PIN.addKeyListener(new KeyAdapter() {
 		    public void keyTyped(KeyEvent e) { 
 		    	if  (!Character.isDigit(e.getKeyChar())) {
@@ -328,23 +393,25 @@ public class CreateView extends JPanel implements ActionListener {
 		return txt;
 	}
 	
-	///////////////////// OVERRIDDEN METHODS //////////////////////////////////////////
-	
-	/*
-	 * Responds to button clicks and other actions performed in the CreateView.
-	 * 
-	 * @param e
-	 */
-	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		
-		// TODO
-		//
-		// this is where you'll setup your action listener, which is responsible for
-		// responding to actions the user might take in this view (an action can be a
-		// user clicking a button, typing in a textfield, etc.).
-		//
-		// feel free to use my action listener in LoginView.java as an example.
+	public void setCurrentAccount() {
+		this.account = manager.getAccount();
+		initialize();
+		updateFields();
 	}
+	
+	private void setEditable (Boolean edit) {
+		for (String name : edittable) {
+			
+			textFields.get(name).setEnabled(edit);
+		}
+		PIN.setEnabled(edit);
+		oldPIN.setEnabled(edit);
+		state.setEnabled(edit);
+		cancel.setVisible(edit);
+		getBackButton().setVisible(!edit);
+		if(!edit) {
+			error.setText("");
+		}
+	}
+	
 }

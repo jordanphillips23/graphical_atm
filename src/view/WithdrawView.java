@@ -25,14 +25,13 @@ public class WithdrawView extends InnerView {
 	
 	
 	
-	public void setCurrentAccount(BankAccount account) {
-		this.account = account;
+	public void setCurrentAccount() {
+		this.account = manager.getAccount();
 		updateView();
-		createInput();
-		createWithdrawButton();
-		createTitle("How much would you like to Withdraw?");
+		
 		
 	}
+	
 	
 	private void createWithdrawButton() {
 		JButton button = new JButton("Withdraw");
@@ -41,8 +40,26 @@ public class WithdrawView extends InnerView {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				account.withdraw(1);
-				System.out.println(account.getBalance());
+				if (input.getText().matches("\\d{0,12}[.]?\\d{0,2}")) {
+					getError().setText("");
+					double amount = Double.parseDouble(input.getText());
+					switch(account.withdraw(amount)) {
+					case ATM.INVALID_AMOUNT:
+						getError().setText("Input must be greater than 0");
+						break;
+					case ATM.INSUFFICIENT_FUNDS:
+						getError().setText("Insufficient Funds");
+						break;
+					case ATM.SUCCESS:
+						updateBalance();
+						break;
+					}
+					System.out.println(account.getBalance());
+				}
+				else {
+					getError().setText("Invalid Input must be in the form ###,###.##");
+					System.out.println("Invalid");
+				}
 				
 			}
 			
@@ -52,8 +69,15 @@ public class WithdrawView extends InnerView {
 	
 	public void updateView() {
 		this.removeAll();
-		this.add(new javax.swing.JLabel("hi"));
 		createBackButton();
+		createInput();
+		createWithdrawButton();
+		createErrorField();
+		createTitle("How much would you like to Withdraw?");
+		balanceField();
+		setAccount();
+		updateBalance();
+		
 	}
 	
 	private void createInput() {

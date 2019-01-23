@@ -68,7 +68,9 @@ public class Database {
 			
 			rs = selectStmt.executeQuery();
 			if (rs.next()) {
-				return new BankAccount(rs);
+				if (new BankAccount(rs).getStatus() == 'Y') {
+					return new BankAccount(rs);
+				}	
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -94,7 +96,10 @@ public class Database {
 			
 			rs = selectStmt.executeQuery();
 			if (rs.next()) {
-				return new BankAccount(rs);
+				System.out.println(new BankAccount(rs).getStatus());
+				if (new BankAccount(rs).getStatus() == 'Y') {
+					return new BankAccount(rs);
+				}
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();

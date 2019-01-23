@@ -26,8 +26,8 @@ public class DepositView extends InnerView{
 	}
 
 	
-	public void setCurrentAccount(BankAccount account) {
-		this.account = account;
+	public void setCurrentAccount() {
+		this.account = manager.getAccount();
 		updateView();
 	}
 	
@@ -35,9 +35,13 @@ public class DepositView extends InnerView{
 		this.removeAll();
 		this.add(new javax.swing.JLabel("hi"));
 		createBackButton();
+		createErrorField();
 		createDepositButton();
 		createInput();
 		createTitle("How much would you like to Deposit?");
+		balanceField();
+		setAccount();
+		updateBalance();
 	}
 	
 	private void createDepositButton() {
@@ -47,16 +51,24 @@ public class DepositView extends InnerView{
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				double amount = Double.parseDouble(input.getText());
+				
 				
 				if (input.getText().matches("\\d{0,12}[.]?\\d{0,2}")) {
-					account.deposit(amount);
+					getError().setText("");
+					double amount = Double.parseDouble(input.getText());
+					int value = account.deposit(amount);
+					if (value == ATM.INVALID_AMOUNT) {
+						getError().setText("Invalid Input must be greater than 0");
+					}
+					else {
+						updateBalance();
+					}
 					System.out.println(account.getBalance());
 				}
 				else {
+					getError().setText("Invalid Input must be in the form ###,###.##");
 					System.out.println("Invalid");
 				}
-			
 				
 				
 			}

@@ -11,6 +11,7 @@ import model.BankAccount;
 import view.ATM;
 import view.DepositView;
 import view.HomeView;
+import view.InformationView;
 import view.LoginView;
 import view.TransferView;
 import view.WithdrawView;
@@ -52,11 +53,10 @@ public class ViewManager {
 		} else {
 			switchTo(ATM.HOME_VIEW);
 			HomeView hv = ((HomeView) views.getComponents()[ATM.HOME_VIEW_INDEX]);
-			hv.setCurrentAccount(account);
+			hv.setCurrentAccount();
 			
-			passAccountDeposit(account);
-			passAccountWithdraw(account);
-			passAccountTransfer(account);
+			updateAccounts();
+		
 			
 			LoginView lv = ((LoginView) views.getComponents()[ATM.LOGIN_VIEW_INDEX]);
 			lv.updateErrorMessage("");
@@ -64,18 +64,41 @@ public class ViewManager {
 	}
 	
 	
-	public void passAccountDeposit(BankAccount current) {
+	public void updateAccounts() {
 		DepositView dv = ((DepositView) views.getComponents()[ATM.DEPOSIT_VIEW_INDEX]);
-		dv.setCurrentAccount(current);
+		dv.setCurrentAccount();
+		
+		WithdrawView wv = ((WithdrawView) views.getComponents()[ATM.WITHDRAW_VIEW_INDEX]);
+		wv.setCurrentAccount();
+		
+		TransferView tv = ((TransferView) views.getComponents()[ATM.TRANSFER_VIEW_INDEX]);
+		tv.setCurrentAccount();
+		
+		InformationView iv = ((InformationView) views.getComponents()[ATM.INFORMATION_VIEW_INDEX]);
+		iv.setCurrentAccount();
+		
+	}
+
+	public void passAccountDeposit(BankAccount current) {
+		
 	}
 	
 	public void passAccountWithdraw(BankAccount current) {
-		WithdrawView wv = ((WithdrawView) views.getComponents()[ATM.WITHDRAW_VIEW_INDEX]);
-		wv.setCurrentAccount(current);
+		
 	}
 	public void passAccountTransfer(BankAccount current) {
-		TransferView tv = ((TransferView) views.getComponents()[ATM.TRANSFER_VIEW_INDEX]);
-		tv.setCurrentAccount(current);
+		
+	}
+	public void passAccountInfo(BankAccount current) {
+		
+	}
+	
+	public void setAccount(BankAccount current) {
+		this.account = current;
+	}
+	
+	public BankAccount getAccount() {
+		return account;
 	}
 	
 	public void updateHome() {
@@ -83,7 +106,14 @@ public class ViewManager {
 		hv.makeView();
 	}
 	
-	
+	public void updateInnerViews() {
+		DepositView dv = ((DepositView) views.getComponents()[ATM.DEPOSIT_VIEW_INDEX]);
+		dv.updateBalance();
+		WithdrawView wv = ((WithdrawView) views.getComponents()[ATM.WITHDRAW_VIEW_INDEX]);
+		wv.updateBalance();
+		TransferView tv = ((TransferView) views.getComponents()[ATM.TRANSFER_VIEW_INDEX]);
+		tv.updateBalance();
+	}
 	/**
 	 * Switches the active (or visible) view upon request.
 	 * 
@@ -118,13 +148,41 @@ public class ViewManager {
 		}
 	}
 	
-	public void logOut() {
+	public void closeAccount() {
+		try {
+			int choice = JOptionPane.showConfirmDialog(
+					views,
+					"Are you sure you want to permanently close your account?",
+					"Close ATM Account",
+					JOptionPane.YES_NO_OPTION,
+					JOptionPane.QUESTION_MESSAGE
+				);
+				
+				if (choice == 0) {
+					db.closeAccount(account);
+					account.setStatus('N');
+					logOut(account);
+				}
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+			
+		
+	}
+	
+	public void logOut(BankAccount current) {
+		this.account = current;
 		this.switchTo(ATM.LOGIN_VIEW);
 		LoginView lv = ((LoginView) views.getComponents()[ATM.LOGIN_VIEW_INDEX]);
 		lv.logOut();
+		db.updateAccount(this.account);
 		this.account = null;
 		this.destination = null;
 		
+	}
+	
+	public Container getViews() {
+		return views;
 	}
 	
 	public Database getDB() {

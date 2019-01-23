@@ -8,6 +8,7 @@ import java.text.DecimalFormat;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
@@ -59,8 +60,10 @@ public class HomeView extends JPanel implements ActionListener {
 		createLabel("Your Balance is: $" + balance.format(current.getBalance()), 100, 80, 300, 35);
 		
 		createLinkButton("Deposit", 100, 120, 300, 35, ATM.DEPOSIT_VIEW);
-		createLinkButton("Withdraw", 100, 200, 300, 35, ATM.WITHDRAW_VIEW);
-		createLinkButton("Transfer", 100, 280, 300, 35, ATM.TRANSFER_VIEW);
+		createLinkButton("Withdraw", 100, 180, 300, 35, ATM.WITHDRAW_VIEW);
+		createLinkButton("Transfer", 100, 240, 300, 35, ATM.TRANSFER_VIEW);
+		createLinkButton("View/Edit Information", 100, 300, 300, 35, ATM.INFORMATION_VIEW);
+		createCloseAccount("Close Account", 100, 360, 300, 35);
 					
 		logOutButton.addActionListener(this);
 		logOutButton.setBounds(10, 430, 200, 40);
@@ -76,6 +79,21 @@ public class HomeView extends JPanel implements ActionListener {
 	}
 	
 	
+	private void createCloseAccount(String name, int x, int y, int width, int height) {
+		JButton button = new JButton(name);
+		button.setBounds(x, y, width, height);
+		button.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				manager.closeAccount();
+			
+			}});
+		this.add(button);
+			
+		
+	}
+
 	private void createLabel(String message, int x, int y, int width, int height) {
 		JLabel label = new JLabel(message);
 		label.setBounds(x, y, width, height);
@@ -91,8 +109,9 @@ public class HomeView extends JPanel implements ActionListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+				System.out.println(current.getUser().getStreetAddress());
 				manager.switchTo(view);
+				manager.updateInnerViews();
 				
 			}
 			
@@ -123,7 +142,7 @@ public class HomeView extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == logOutButton) {
 			
-			manager.logOut();
+			manager.logOut(current);
 		}
 		
 		// TODO
@@ -135,9 +154,8 @@ public class HomeView extends JPanel implements ActionListener {
 		// feel free to use my action listener in LoginView.java as an example.
 	}
 	
-	public void setCurrentAccount(BankAccount current) {
-		System.out.println(current.toString());
-		this.current = current;
+	public void setCurrentAccount() {
+		this.current = manager.getAccount();
 		makeView();
 	}
 	
